@@ -1,0 +1,27 @@
+# Docker build artifacts
+*.tar
+*.img
+*.log
+
+# Environment files
+**/.env
+**/.env.*
+
+# Local Docker volumes, logs, temp
+volumes/
+data/
+logs/
+tmp/
+
+# Secret files and folders
+**/secrets/
+
+# Editor and system files
+.vscode/
+.DS_Store
+
+# compressed files
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz

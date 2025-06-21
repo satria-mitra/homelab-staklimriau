@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-oss:11.0.0
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_password
+    volumes:
+      - grafana_data:/var/lib/grafana
+    secrets:
+      - grafana_password
+    networks:
+      - shared_network
+
+volumes:
+  grafana_data:
+
+secrets:
+  grafana_password:
+    file: ./secrets/grafana_password.txt
+
+networks:
+  shared_network:
+    external: true
