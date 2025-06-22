@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Sensor as Sensor Device (AAWS/AWS/ARG)
+    participant MQTT as MQTT Broker
+    participant Docker as Docker
+    participant NR as Node-RED (in Docker)
+    participant DB as PostgreSQL (in Docker)
+    participant Grafana as Grafana (in Docker)
+    participant User as User/Operator
+
+    Sensor->>MQTT: Publish data)
+    MQTT->>NR: Forward data (subscribe)
+    NR->>NR: Validate & process data
+    NR->>DB: Store data
+    User->>Grafana: Open dashboard
+    Grafana->>DB: Query data
+    DB-->>Grafana: Return data
+    Grafana-->>User: Display visualization
+
+    Docker-->>NR: Start/Manage container
+    Docker-->>DB: Start/Manage container
+    Docker-->>Grafana: Start/Manage container

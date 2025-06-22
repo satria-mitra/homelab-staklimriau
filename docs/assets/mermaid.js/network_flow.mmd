@@ -1,0 +1,25 @@
+graph TD
+    A[Internet/ISP] --> B(Modem)
+    B --> C[MikroTik Router<br/>IP addr: 192.168.10.0/24<br/>IP gateway: 192.168.10.1]
+    C --> D[HPE Server/Proxmox Host<br/>IP addr: 192.168.20.0/24 <br/>IP gateway: 192.168.20.1<br/>VLAN tag: 20]
+    C --> E[Local Network/Wifi<br/>IP addr: 192.168.10.0/24<br/>IP gateway: 192.168.10.1]
+
+
+    subgraph Proxmox 192.168.20.0/24
+        D1[VM Ubuntu<br/>IP addr: 192.168.30.20/24 <br/>IP gateway: 192.168.30.1<br/>VLAN tag: 30]
+        D2[VM Lain<br/>IP addr: 192.168.30.x/24 <br/>IP gateway: 192.168.30.1<br/>VLAN tag: 30]
+    end
+
+    subgraph Docker on VM Ubuntu
+        D1A[Grafana Container<br/>IP addr: 172.22.0.4/16<br/>Port: 3000]
+        D1B[PostgreSQL Container<br/>IP addr: 172.22.0.7/16<br/>Port: 8083]
+        D1C[Node-RED Container<br/>IP addr: 172.22.0.3/16<br/>Port: 1880]
+        D1D[Portainer Container<br/>IP addr: 172.22.0.2/16<br/>Port: 1880]
+    end
+
+    D --> D1
+    D --> D2
+    D1 --> D1A
+    D1 --> D1B
+    D1 --> D1C
+    D1 --> D1D
