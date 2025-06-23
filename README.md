@@ -57,7 +57,7 @@ cd homelab-staklimriau
 
 ### ⚙️ 3. Konfigurasi `.env` (opsional)
 
-Buat file `.env` di setiap directory aplikasi. Lihat `docker-compose.yml` untuk meliahat konfigurasi file .env:
+Buat file `.env` di setiap directory aplikasi. Lihat `docker-compose.yml` untuk meliahat konfigurasi file .env\
 Contoh file .env :
 
 ```env
