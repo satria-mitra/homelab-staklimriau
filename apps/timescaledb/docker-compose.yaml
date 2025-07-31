@@ -22,7 +22,7 @@ volumes:
 
 secrets:
   postgres_password:
-    file: ./secrets/timescaledb_password.txt
+    file: ./secrets/postgres_password.txt
 
 networks:
   shared_network:
