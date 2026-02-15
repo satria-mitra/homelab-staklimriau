@@ -1,0 +1,22 @@
+http:
+  routers:
+    ikro-router:
+      rule: Host(`ikro.staklimriau.web.id`)
+      entryPoints:
+        - https
+      service: ikro-service
+      middlewares:
+        - ikro-add-prefix
+      tls:
+        certResolver: cloudflare
+        
+  services:
+    ikro-service:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.12.189"       # nanti path-nya /iklimmikro
+
+  middlewares:
+    ikro-add-prefix:
+      addPrefix:
+        prefix: "/iklimmikro"

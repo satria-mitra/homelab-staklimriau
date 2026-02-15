@@ -9,11 +9,17 @@ services:
       - "3000:3000"
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
-      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_password
+      GF_SECURITY_ADMIN_PASSWORD_FILE: /run/secrets/grafana_password
     volumes:
       - grafana_data:/var/lib/grafana
     secrets:
       - grafana_password
+    labels:
+      - "traefik.enable=true"  # Enable Traefik for this container
+      - "traefik.http.routers.grafana.rule=Host(`grafana.staklimriau.web.id`)"  # Replace with your public IP or domain
+      - "traefik.http.routers.grafana.entrypoints=https"  # Use the HTTPS entry point
+      - "traefik.http.routers.grafana.tls.certresolver=cloudflare"  # Use Let's Encrypt to get an SSL cert
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"  # Internal Grafana port
     networks:
       - shared_network
 

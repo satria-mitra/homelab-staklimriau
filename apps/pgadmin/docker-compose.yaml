@@ -3,7 +3,7 @@ version: "3.8"
 
 services:  
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:latest
     container_name: db_pgadmin
     restart: unless-stopped
     environment:
@@ -15,6 +15,12 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     secrets:
       - pgadmin_password
+    labels:
+      - "traefik.enable=true"  # Enable Traefik for this container
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.staklimriau.web.id`)"  # Replace with your public IP or domain
+      - "traefik.http.routers.pgadmin.entrypoints=https"  # Use the HTTPS entry point
+      - "traefik.http.routers.pgadmin.tls.certresolver=cloudflare"  # Use Let's Encrypt to get an SSL cert
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"  # Internal pgAdmin port
     networks:
       - shared_network
 

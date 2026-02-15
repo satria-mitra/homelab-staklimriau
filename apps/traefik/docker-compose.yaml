@@ -1,23 +1,51 @@
-version: "3.8"
 services:
   traefik:
     image: traefik:latest
     container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
-      - 80:80
-      - 443:443
-      # --> (Optional) Enable Dashboard, don't do in production
-      # - 8080:8080
-      # <--
+      - "80:80"  # Expose HTTP
+      - "443:443"  # Expose HTTPS
+      - "8080:8080"  # Expose the Traefik Dashboard (optional)
+    environment:
+      CF_API_EMAIL: ${CF_API_EMAIL}
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+      TRAEFIK_DASHBOARD_CREDENTIALS: ${TRAEFIK_DASHBOARD_CREDENTIALS}
+    secrets:
+      - cf-token
+    env_file:
+      - .env
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./config/traefik.yml:/etc/traefik/traefik.yml:ro
-#    environment:
-#      - CF_DNS_API_TOKEN=your-cloudflare-api-token  # <-- Change this to your Cloudflare API Token
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Allow Traefik to communicate with Docker API
+      - ./config:/etc/traefik
+      - ./config/acme.json:/acme.json
+      - ./logs:/var/log/traefik
+    labels:
+      - "traefik.enable=true"
+      # HTTP Router for Traefik Dashboard (insecure)
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.staklimriau.web.id`)"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=https-redirect"   
+      # HTTPS Router for Traefik Dashboard (secure)
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.staklimriau.web.id`)"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=*.staklimriau.web.id"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=staklimriau.web.id"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
     networks:
       - shared_network
-    restart: unless-stopped
+
+secrets:
+  cf-token:
+    file: ./secrets/cf-token  # Ensure the cf-token file is available
 
 networks:
   shared_network:
-    external: true  # <-- (Optional) Change this to false if you want to create a new network
+    external: true

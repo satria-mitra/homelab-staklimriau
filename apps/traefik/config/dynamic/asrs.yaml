@@ -1,0 +1,22 @@
+http:
+  routers:
+    asrs-router:
+      rule: Host(`asrs.staklimriau.web.id`)
+      entryPoints:
+        - https
+      service: asrs-svc
+      middlewares:
+        - asrs-add-prefix
+      tls:
+        certResolver: cloudflare   # sesuaikan dengan punyamu
+
+  services:
+    asrs-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.12.189"   # server ASRS kamu
+
+  middlewares:
+    asrs-add-prefix:
+      addPrefix:
+        prefix: "/asrsview"

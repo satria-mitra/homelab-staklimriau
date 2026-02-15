@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html  # Mount the HTML page
+    ports:
+      - "100:80"  # Expose HTTP port
+      - "440:443"  # Expose HTTPS port (optional if SSL is enabled)
+    networks:
+      - shared_network
+    labels:
+      - "traefik.enable=true"  # Enable Traefik for this container
+      - "traefik.http.routers.nginx.rule=Host(`staklimriau.web.id`)"  # Replace with your public IP or domain
+      - "traefik.http.routers.nginx.entrypoints=https"  # Use the HTTPS entry point
+      - "traefik.http.routers.nginx.tls.certresolver=cloudflare"  # Use Let's Encrypt to get an SSL cert
+      - "traefik.http.services.nginx.loadbalancer.server.port=80"  # Internal Nginx port
+
+networks:
+  shared_network:
+    external: true  # Assuming you're using an external network; adjust if necessary
