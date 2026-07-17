@@ -12,6 +12,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     secrets:
       - postgres_password
+    labels:
+      - "traefik.enable=true"  # Enable Traefik for this container
+      - "traefik.http.routers.timescaledb.rule=Host(`timescaledb.staklimriau.web.id`)"  # Replace with your public IP or domain
+      - "traefik.http.routers.timescaledb.entrypoints=https"  # Use the HTTPS entry point
+      - "traefik.http.routers.timescaledb.tls.certresolver=cloudflare"  # Use Let's Encrypt to get an SSL cert
+      - "traefik.http.services.timescaledb.loadbalancer.server.port=5432"  # Internal PostgreSQL port
     volumes:
       - timescaledb_data:/var/lib/postgresql/data
     networks:
